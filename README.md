@@ -39,8 +39,8 @@
 | 属性 | 类型 | 描述 |
 |------|------|------|
 | `mode` | `str` | 布尔运算模式（由子类定义） |
-| `is_overlap` | `bool` | 对象是否重叠，默认 `True` |
-| `keep_objects` | `BoolProperty` | 是否保留原始对象（快捷键：Alt） |
+| `is_overlap` | `bool` | 对象是否重叠，默认 `True` 
+| `keep_objects` | `BoolProperty` | 是否保留原始对象（快捷键：Alt）keep_objects:表示在执行布尔操作之后是否保留用于切割的物体。 ｜
 
 ---
 
@@ -62,13 +62,17 @@
 3. **Primary Object 区块**：
    - 显示求解器选项 (`solver`)
    - 若求解器为 `EXACT`，显示 `use_self` 和 `use_hole_tolerant`
+   - `use_self`表示允许操作对象中存在自相交，如果模型本身有这一类的网格，启用此选项可以使布尔运算正常运行
+   - `use_hole_tolerant`表示孔洞容错，当模型中存在孔洞或者开放的几何体，启用此选项可以获得更好的布尔结果，代价是速度变慢。
 4. **Secondary Object 区块**：
    - 若非 `SLICE` 模式，显示次级求解器选项
    - 显示 `keep_objects` 属性
    - 显示随机位置偏移选项（`use_loc_rnd`, `loc_offset`, `seed`）
 5. **Pre-processing 区块**：
    - 显示 `merge_distance`（合并距离）
+   - `merge_distance`
    - 显示 `dissolve_distance`（退化溶解距离）
+   - `dissolve_distance`
 
 #### 输出
 
@@ -92,7 +96,9 @@
 1. **准备阶段**：
    - 获取 `destructive` 属性配置
    - 检查是否使用 `MANIFOLD` 求解器
+      > fe
    - 调用 `objectlib.prepare_objects()` 分离主对象和次级对象
+      > 
    - 调用 `meshlib.prepare()` 对所有对象进行网格预处理（合并顶点、溶解退化面）
 
 2. **非流形检测**：
@@ -143,6 +149,7 @@
 
 4. **重叠检测**：
    - 若选中超过 2 个对象且非 `SLICE` 模式
+   - 排除当前的活动对象，一般是最后一个选中的对象，检测其他对象与当前对象的重叠关系
    - 调用 `meshlib.detect_overlap()` 检测次级对象间是否重叠
 
 5. **属性初始化**：
